@@ -17,12 +17,9 @@ spreadsheet = client.open("Testtest")
 sheet = spreadsheet.sheet1
 
 Header = ["Effective Date", "Business Date", "Description", "Amount"]
-currentRow = 1
-
-sheet.insert_row(Header, currentRow)
-currentRow+=1
-
 rows = []
+
+rows.append(Header)
 
 def insert(wordList):
         colOne = wordList[0] + " " + wordList[1]
@@ -31,8 +28,7 @@ def insert(wordList):
         for i in range(4, (len(wordList)-2)):
             colThree += wordList[i] + " "
         colFour = wordList[len(wordList)-1]
-        sheet.insert_row([colOne, colTwo, colThree, colFour], currentRow)
-        currentRow += 1
+        rows.append([colOne, colTwo, colThree, colFour])
 
 with pdfplumber.open(r'C:\Users\vidrinen\Downloads\test.pdf') as pdf:
     for i in range(0, len(pdf.pages)):
@@ -45,9 +41,8 @@ with pdfplumber.open(r'C:\Users\vidrinen\Downloads\test.pdf') as pdf:
                 if(words[0]=="Continued"): correctInfo = False
                 elif(words[0]=="TOTAL"):
                     correctInfo = False
-                    sheet.update_cell(currentRow, 3, "Total: ")
-                    sheet.update_cell(currentRow, 4, words[len(words)-1])
-                    currentRow += 2
+                    rows.append(["", "", "Total: ", words[len(words)-1]])
+                    rows.append([""])
                 elif(words[0]=="Eff."): continue
                 else: 
                     insert(words)
@@ -55,3 +50,5 @@ with pdfplumber.open(r'C:\Users\vidrinen\Downloads\test.pdf') as pdf:
                 if(line=='Deposits and Credits'): correctInfo = True
                 elif(line=='ATM and Debit Card Withdrawals'): correctInfo = True
                 elif(line=='Electronic Withdrawals'): correctInfo = True
+
+sheet.insert_rows(rows)
